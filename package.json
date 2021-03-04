@@ -1,0 +1,11 @@
+{
+  "name": "auto-divider",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.4.1",
+    "truffle": "^5.2.2",
+    "wanchain-truffle-sdk": "^1.0.1"
+  }
+}
