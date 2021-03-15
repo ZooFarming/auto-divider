@@ -1,47 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
+import "./AutoDividerStorage.sol";
 
-contract AutoDivider is Ownable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
-    using EnumerableSet for EnumerableSet.AddressSet;
 
-    uint public totalAllocPoint;
-
-    EnumerableSet.AddressSet private users;
-
-    mapping(address => uint) public userAllocs;
-
+contract AutoDividerDelegate is Initializable, AccessControl, AutoDividerStorage {
     event AddUser(address user, uint allocPoint);
-
     event SetUser(address user, uint allocPoint);
 
-    function addAddress(address user, uint allocPoint) public onlyOwner {
+    function initialize(address admin) public payable initializer {
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+    }
+
+    function addAddress(address user, uint allocPoint) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(!users.contains(user), "user exist");
         users.add(user);
         userAllocs[user] = allocPoint;
         totalAllocPoint = totalAllocPoint.add(allocPoint);
-
         emit AddUser(user, allocPoint);
     }
 
-    function setAddress(address user, uint allocPoint) public onlyOwner {
-        if (users.contains(user)) {
-            users.remove(user);
-            totalAllocPoint = totalAllocPoint.sub(userAllocs[user]);
-        }
+    function setAddress(address user, uint allocPoint) public {
+        removeAddress(user);
+        addAddress(user, allocPoint);
+    }
 
-        users.add(user);
-
-        userAllocs[user] = allocPoint;
-        totalAllocPoint = totalAllocPoint.add(allocPoint);
-
-        emit SetUser(user, allocPoint);
+    function removeAddress(address user) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(users.contains(user), "user not exist");
+        users.remove(user);
+        totalAllocPoint = totalAllocPoint.sub(userAllocs[user]);
     }
 
     function getUsers() public view returns (address[] memory _users, uint[] memory _allocPoints) {
