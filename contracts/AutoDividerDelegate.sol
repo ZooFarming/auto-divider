@@ -33,6 +33,7 @@ contract AutoDividerDelegate is Initializable, AccessControl, AutoDividerStorage
         require(users.contains(user), "user not exist");
         users.remove(user);
         totalAllocPoint = totalAllocPoint.sub(userAllocs[user]);
+        userAllocs[user] = 0;
     }
 
     function getUsers() public view returns (address[] memory _users, uint[] memory _allocPoints) {
