@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.1",
+    "@truffle/hdwallet-provider": "^1.5.1",
     "truffle": "^5.2.5",
     "wanchain-truffle-sdk": "^1.0.1"
   }
