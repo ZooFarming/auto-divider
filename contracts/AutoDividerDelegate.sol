@@ -5,6 +5,9 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/proxy/Initializable.sol";
 import "./AutoDividerStorage.sol";
 
+interface IFarm {
+    function dev(address _devaddr) external;
+}
 
 contract AutoDividerDelegate is Initializable, AccessControl, AutoDividerStorage {
     event AddUser(address user, uint allocPoint);
@@ -62,5 +65,10 @@ contract AutoDividerDelegate is Initializable, AccessControl, AutoDividerStorage
             _user = _users[i]; 
             IERC20(token).transfer(_user, _amount);
         }
+    }
+
+    function dev(address farmAddr, address _dev) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        IFarm(farmAddr).dev(_dev);
     }
 }
